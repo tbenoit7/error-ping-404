@@ -2,12 +2,18 @@
 
 Escape game en terminal, en pur bash. On reçoit un appel à l'aide, on clique sur le lien… et on se réveille dans une salle d'attente vide. Pour sortir, il faut traverser 4 lieux en utilisant les commandes du cours, avant la fin du compte à rebours.
 
-## Lancer une partie
+## Installer et lancer
 
 ```
+cd ~
+git clone https://github.com/<pseudo>/error_ping_404.git
 cd error_ping_404
 ./lancer.sh
 ```
+
+Le jeu doit être cloné sur une partition Linux (le dossier personnel `~` convient). Une partition FAT/NTFS, comme celle d'une clé USB de stockage, ne gère pas `chmod +x`, dont le jeu a besoin : `lancer.sh` le détecte et l'indique.
+
+Prérequis : bash 4 ou plus, et les outils standards (`ps`, `tar`, `sha256sum`). Rien à installer, ni `sudo` ni internet pendant la partie.
 
 Options :
 

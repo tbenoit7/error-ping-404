@@ -33,6 +33,33 @@ if ! [[ "$NIVEAU_DEPART" =~ ^[0-3]$ ]]; then
     exit 1
 fi
 
+# ---------------------------------------------------------------- Vérification du disque
+# Le jeu crée des scripts et repose sur chmod +x : la partition doit gérer
+# les droits Unix et autoriser l'exécution (pas de FAT/exFAT/NTFS, pas de noexec).
+verifier_disque() {
+    local test="$JEU_ROOT/.test_droits_$$"
+    printf '#!/usr/bin/env bash\nexit 0\n' > "$test" 2> /dev/null || {
+        echo "Impossible d'écrire dans $JEU_ROOT."; return 1; }
+    chmod 644 "$test"
+    if [ -x "$test" ]; then rm -f "$test"; return 1; fi
+    chmod 755 "$test"
+    if ! "$test" 2> /dev/null; then rm -f "$test"; return 1; fi
+    rm -f "$test"
+}
+if ! verifier_disque; then
+    echo "Ce dossier ne gère pas les droits d'exécution (partition FAT/NTFS ou montée en noexec)."
+    echo "Le jeu repose sur chmod +x : clone-le ou copie-le dans ton dossier personnel, par exemple :"
+    echo "    cp -r \"$JEU_ROOT\" ~ && cd ~/$(basename "$JEU_ROOT") && ./lancer.sh"
+    exit 1
+fi
+
+# ---------------------------------------------------------------- Ambiance sombre
+# Fond noir et texte gris clair le temps de la partie, puis couleurs d'origine
+# restaurées (codes OSC 10/11, gérés par la plupart des terminaux Linux).
+ecran_sombre()   { printf '\e]10;#d0d0d0\a\e]11;#0a0a0a\a'; clear; }
+ecran_normal()   { printf '\e]110\a\e]111\a'; }
+trap 'ecran_normal' EXIT
+
 # ---------------------------------------------------------------- Remise à zéro
 arreter_brouillage
 rm -rf "$JEU_ROOT/monde" "$ETAT_DIR"
@@ -47,38 +74,40 @@ etat_set tablette 0
 # ---------------------------------------------------------------- Intro
 intro() {
     clear
+    echo
     VITESSE=0.01
-    echo "${FOND_GRIS}${BLANC} Boîte de réception (1) ─────────────────────────────── ${RESET}"
-    echo "De      : ████████@█████"
-    echo "Objet   : aide"
-    echo "Reçu    : il y a 0 minute"
+    echo "$MARGE${FOND_GRIS} Boîte de réception (1) ─────────────────────────────── ${RESET}"
+    echo "${MARGE}De      : ████████@█████"
+    echo "${MARGE}Objet   : aide"
+    echo "${MARGE}Reçu    : il y a 0 minute"
     echo
-    ecrire "Je ne sais pas si ce message parviendra à quelqu'un."
-    ecrire "Si c'est le cas, lis-le jusqu'au bout."
+    narrer "Je ne sais pas si ce message parviendra à quelqu'un."
+    narrer "Si c'est le cas, lis-le jusqu'au bout."
     echo
-    ecrire "Je suis retenu quelque part. Je ne sais pas qui m'a"
-    ecrire "amené ici, ni pourquoi. Les pièces se répètent. Il y a"
-    ecrire "un ascenseur qui descend sans fin, et des néons qui ne"
-    ecrire "s'éteignent jamais."
+    narrer "Je suis retenu quelque part. Je ne sais pas qui m'a"
+    narrer "amené ici, ni pourquoi. Les pièces se répètent. Il y a"
+    narrer "un ascenseur qui descend sans fin, et des néons qui ne"
+    narrer "s'éteignent jamais."
     echo
-    ecrire "Je n'ai presque plus de batterie. J'ai réussi à"
-    ecrire "partager ma position avant que le réseau ne coupe :"
+    narrer "Je n'ai presque plus de batterie. J'ai réussi à"
+    narrer "partager ma position avant que le réseau ne coupe :"
     echo
-    echo "    ${BLEU}http://10.4.0.4/localiser?id=0017${RESET}"
+    echo "$MARGE    ${BLEU}${GRAS}http://10.4.0.4/localiser?id=0017${RESET}"
     echo
-    ecrire "Je t'en supplie, viens me chercher."
-    ecrire "Tu es le seul à qui j'ai pu écrire."
+    narrer "Je t'en supplie, viens me chercher."
+    narrer "Tu es le seul à qui j'ai pu écrire."
     echo
-    read -r -p "[ Appuie sur Entrée pour ouvrir le lien ] "
+    read -r -p "$MARGE$COUL_PISTE[ Appuie sur Entrée pour ouvrir le lien ]$RESET "
     VITESSE=0.03
     glitch
     clear
     pause 2
-    ecrire "Tu ouvres les yeux. Une odeur de produits d'entretien, un blanc aveuglant." "$GRIS"
-    ecrire "Un bourdonnement de néon à l'extérieur, un tic d'horloge à l'intérieur." "$GRIS"
+    narrer "Tu ouvres les yeux. Une odeur de produits d'entretien, un blanc aveuglant."
+    narrer "Un bourdonnement de néon à l'extérieur, un tic d'horloge à l'intérieur."
     pause 1
 }
 
+ecran_sombre
 [ "$INTRO" = "1" ] && intro
 
 # ---------------------------------------------------------------- Le monde
@@ -86,11 +115,12 @@ generer_jusqua "$JEU_ROOT/monde" "$NIVEAU_DEPART"
 etat_set debut "$(date +%s)"
 
 case "$NIVEAU_DEPART" in
-    0) depart="$JEU_ROOT/monde/salle_attente" ;;
-    1) depart="$JEU_ROOT/monde/ascenseur" ;;
-    2) depart="$JEU_ROOT/monde/couloir_hotel" ;;
-    3) depart="$JEU_ROOT/monde/quai" ;;
+    0) depart="$JEU_ROOT/monde/salle_attente"; titre="NIVEAU 0 · LA SALLE D'ATTENTE" ;;
+    1) depart="$JEU_ROOT/monde/ascenseur";     titre="NIVEAU 1 · L'ASCENSEUR" ;;
+    2) depart="$JEU_ROOT/monde/couloir_hotel"; titre="NIVEAU 2 · LE COULOIR D'HÔTEL" ;;
+    3) depart="$JEU_ROOT/monde/quai";          titre="NIVEAU 3 · LE QUAI" ;;
 esac
+bandeau "$titre"
 
 # Le shell de jeu : un bash interactif avec son propre prompt et son timer
 ( cd "$depart" && bash --rcfile "$JEU_ROOT/lib/shellrc.sh" -i )
@@ -98,4 +128,5 @@ esac
 # ---------------------------------------------------------------- Après la partie
 arreter_brouillage
 echo
-echo "${GRIS}Merci d'avoir joué à Error Ping 404.${RESET}"
+piste "Merci d'avoir joué à Error Ping 404."
+echo

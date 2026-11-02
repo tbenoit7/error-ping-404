@@ -41,12 +41,17 @@ __jeu_prompt() {
         echo
         exit 0
     fi
-    couleur="$BLANC"
-    (( $(temps_restant) < 120 )) && couleur="$ROUGE$GRAS"
-    PS1="\[$GRIS\][\[$BLANC\]$(__jeu_lieu)\[$GRIS\] | \[$couleur\]$(temps_formate)\[$RESET$GRIS\]]\[$RESET\] \W \$ "
+    local reste lieu couleur_lieu="$COUL_PISTE"
+    reste="$(temps_restant)"
+    if   (( reste > 300 )); then couleur="$VERT"
+    elif (( reste > 120 )); then couleur="$JAUNE"
+    else couleur="$ROUGE$GRAS"; fi
+    lieu="$(__jeu_lieu)"
+    [[ "$lieu" == *"?"* ]] && couleur_lieu="$COUL_MYSTERE"
+    # Une ligne vide, puis le bandeau du lieu et du temps, puis le dossier courant
+    PS1="\n\[$couleur_lieu\]━━ \[$GRAS\]$lieu\[$RESET$couleur_lieu\] ━━ \[$RESET$couleur\]$(temps_formate)\[$RESET$couleur_lieu\] ━━\[$RESET\]\n\[$GRIS\]\W\[$RESET\] \$ "
 }
 PROMPT_COMMAND=__jeu_prompt
 
-echo
-ecrire "Vérifie bien à regarder partout et à ne rien oublier... (cat regarder_autour.txt)" "$GRIS"
-echo
+piste "Vérifie bien à regarder partout et à ne rien oublier..."
+piste "(cat regarder_autour.txt)"

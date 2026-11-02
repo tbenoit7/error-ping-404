@@ -9,8 +9,25 @@ VERT=$'\e[32m'
 JAUNE=$'\e[33m'
 BLEU=$'\e[34m'
 CYAN=$'\e[36m'
-BLANC=$'\e[97m'
+MAGENTA=$'\e[35m'
+BLANC=$'\e[39m'          # couleur de texte par défaut du terminal
 FOND_GRIS=$'\e[100m'
+
+# ---------------------------------------------------------------- Code couleur
+# Chaque type de texte a sa couleur, pour que le joueur s'y retrouve :
+#   narration (ce qu'on voit, ce qu'il se passe)  -> couleur normale
+#   réussite (une porte s'ouvre)                  -> vert
+#   échec (mauvais code, rien ne se passe)        -> jaune
+#   piste (où aller ensuite, aide)                -> cyan
+#   mystère (fin secrète, détails étranges)       -> magenta
+#   danger (fin ratée, temps presque écoulé)      -> rouge
+COUL_NARRATION="$BLANC"
+COUL_SUCCES="$VERT$GRAS"
+COUL_ECHEC="$JAUNE"
+COUL_PISTE="$CYAN"
+COUL_MYSTERE="$MAGENTA"
+COUL_DANGER="$ROUGE$GRAS"
+MARGE="  "
 
 # Vitesse de la machine à écrire (secondes par caractère).
 # ECRITURE_RAPIDE=1 désactive l'effet (tests, démo pressée).
@@ -29,6 +46,21 @@ ecrire() {
         done
     fi
     printf '%s\n' "$RESET"
+}
+
+# Raccourcis par type de texte (avec une marge à gauche)
+narrer()  { ecrire "$MARGE$1" "$COUL_NARRATION"; }
+succes()  { ecrire "$MARGE$1" "$COUL_SUCCES"; }
+echec()   { echo "$MARGE$COUL_ECHEC$1$RESET"; }
+piste()   { echo "$MARGE$COUL_PISTE$1$RESET"; }
+mystere() { ecrire "$MARGE$1" "$COUL_MYSTERE"; }
+danger()  { ecrire "$MARGE$1" "$COUL_DANGER"; }
+
+# Grand titre de lieu : bandeau "NIVEAU 1 · L'ASCENSEUR"
+bandeau() {
+    echo
+    echo "$MARGE${2:-$COUL_PISTE}━━━━━━━━  $1  ━━━━━━━━$RESET"
+    echo
 }
 
 # Pause, sauf en mode rapide
