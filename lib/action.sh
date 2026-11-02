@@ -84,7 +84,8 @@ action_television() {
     pause 1
     # Une ligne qui n'a rien à faire là, une demi-seconde
     printf '%s' "$MARGE${ROUGE}${GRAS}        regarde-toi dans le MIROIR${RESET}"
-    if [ "${ECRITURE_RAPIDE:-0}" = "1" ]; then echo; else sleep 0.5; printf '\r%60s\r' ''; fi
+    sleep 0.5
+    printf '\r%60s\r' ''
     echo
     echo "$MARGE${BLEU}══════════════════════════════════════════════════════${RESET}"
     echo "$MARGE${GRIS}                    Fin des programmes.${RESET}"

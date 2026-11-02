@@ -197,7 +197,7 @@ EOF
 demarrer_brouillage() {
     arreter_brouillage
     mkdir -p "$ETAT_DIR"
-    printf '#!/usr/bin/env bash\n# Brouillage du signal télé\nwhile true; do sleep 1; done\n' > "$ETAT_DIR/brouillage"
+    printf '#!/usr/bin/env bash\n# Brouillage du signal télé\nwhile true; do sleep 1 & wait $!; done\n' > "$ETAT_DIR/brouillage"
     nohup bash "$ETAT_DIR/brouillage" > /dev/null 2>&1 &
     etat_set brouillage_pid "$!"
 }

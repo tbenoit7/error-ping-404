@@ -29,22 +29,18 @@ COUL_MYSTERE="$MAGENTA"
 COUL_DANGER="$ROUGE$GRAS"
 MARGE="  "
 
-# Vitesse de la machine à écrire (secondes par caractère).
-# ECRITURE_RAPIDE=1 désactive l'effet (tests, démo pressée).
-VITESSE="${VITESSE:-0.03}"
+# Vitesse de la machine à écrire (secondes par caractère), pour tout le jeu.
+# lancer.sh la modifie seulement pendant l'intro.
+VITESSE=0.03
 
 # Affiche un texte lettre par lettre : ecrire "texte" [couleur]
 ecrire() {
     local texte="$1" couleur="${2:-}" i
     printf '%s' "$couleur"
-    if [ "${ECRITURE_RAPIDE:-0}" = "1" ]; then
-        printf '%s' "$texte"
-    else
-        for (( i = 0; i < ${#texte}; i++ )); do
-            printf '%s' "${texte:i:1}"
-            sleep "$VITESSE"
-        done
-    fi
+    for (( i = 0; i < ${#texte}; i++ )); do
+        printf '%s' "${texte:i:1}"
+        sleep "$VITESSE"
+    done
     printf '%s\n' "$RESET"
 }
 
@@ -63,9 +59,9 @@ bandeau() {
     echo
 }
 
-# Pause, sauf en mode rapide
+# Pause de quelques secondes
 pause() {
-    [ "${ECRITURE_RAPIDE:-0}" = "1" ] || sleep "$1"
+    sleep "$1"
 }
 
 # Écran brouillé pendant ~1 seconde
@@ -73,7 +69,6 @@ glitch() {
     local caracteres='#@%&$*!?<>/=+~^01ABCDEFXYZ' couleurs=("$ROUGE" "$VERT" "$CYAN" "$BLANC")
     local ligne n i largeur=60
     printf '\a'
-    [ "${ECRITURE_RAPIDE:-0}" = "1" ] && return
     for (( n = 0; n < 18; n++ )); do
         ligne=""
         for (( i = 0; i < largeur; i++ )); do

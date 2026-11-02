@@ -11,7 +11,7 @@ cd error_ping_404
 ./lancer.sh
 ```
 
-Le jeu doit être cloné sur une partition Linux (le dossier personnel `~` convient). Une partition FAT/NTFS, comme celle d'une clé USB de stockage, ne gère pas `chmod +x`, dont le jeu a besoin : `lancer.sh` le détecte et l'indique.
+Le jeu doit être cloné sur une partition Linux (le dossier personnel `~` convient). Une partition FAT/NTFS, comme celle d'une clé USB de stockage, ne gère pas `chmod +x`, dont le jeu a besoin.
 
 Prérequis : bash 4 ou plus, et les outils standards (`ps`, `tar`, `sha256sum`). Rien à installer, ni `sudo` ni internet pendant la partie.
 
@@ -19,10 +19,7 @@ Options :
 
 | Option | Effet |
 | --- | --- |
-| `--duree 10` | Durée de la partie en minutes (15 par défaut) |
 | `--niveau 2` | Mode démo : niveaux 0 à 2 déjà ouverts, départ au niveau 2 |
-| `--sans-intro` | Passe le mail d'introduction |
-| `--rapide` | Désactive l'effet machine à écrire |
 
 `./reinitialiser.sh` efface le monde généré. Pour quitter une partie en cours : `exit`.
 
