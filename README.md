@@ -29,8 +29,8 @@ Options :
 | --- | --- | --- |
 | 0 | La salle d'attente | `ls`, `ls -a`, `cd`, `cat`, `./` |
 | 1 | L'ascenseur | `ls -lS`, `grep`, `find`, `mv` |
-| 2 | Le couloir d'hôtel | `ps aux`, `grep`, `kill`, `mv` |
-| 3 | Le quai | `tar`, `grep`, `ls -lt`, `chmod +x` |
+| 2 | Le couloir | `ps aux`, `grep`, `kill`, `mv` |
+| 3 | Le métro | `tar`, `grep`, `ls -lt`, `chmod +x` |
 
 Trois fins : normale, ratée (temps écoulé ou mauvais train) et secrète.
 

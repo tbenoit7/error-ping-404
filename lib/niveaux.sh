@@ -17,31 +17,64 @@ creer_action() {
 # ---------------------------------------------------------------- Niveau 0
 generer_niveau0() {
     local base="$1" d="$1/salle_attente"
-    local n h appel i
-    n="$(alea 6 15)"
-    h="$(etat_get heure)"
-    appel="$(etat_get appel)"
-    etat_set code0 "$(empreinte "$(( n * h ))$appel")"
+    local n f h appel i nb_fenetres speciale
+    n="$(alea 6 15)"            # nombre de chaises
+    f="$(alea 1 9)"             # chiffre caché derrière une fausse fenêtre
+    h="$(etat_get heure)"       # heure du lancement
+    appel="$(etat_get appel)"   # numéro appelé (17)
+    etat_set code0 "$(empreinte "$(( n + f + h ))$appel")"
 
-    mkdir -p "$d/chaises" "$d/guichet/.tablette" "$d/poubelle"
+    mkdir -p "$d/chaises" "$d/fenetres" "$d/guichet/.tablette" "$d/poubelle"
 
     cat > "$d/regarder_autour.txt" <<'EOF'
 Une salle d'attente d'un blanc aveuglant. Une odeur de produits d'entretien.
 Des rangées de chaises en plastique, toutes vides.
+Aux murs, de grandes fenêtres. Derrière, un ciel parfaitement bleu.
+Trop parfait. Ce ne sont pas de vraies fenêtres.
 L'horloge murale fait tic, tac.
 Au-dessus du guichet, l'écran d'appel affiche un numéro.
 Personne derrière la vitre. Sur la vitre, quelqu'un a écrit au feutre :
     TOUT EST COMPTÉ ICI.
 Au fond, une porte de service, avec un clavier à code.
 Une poubelle déborde près de l'entrée.
+Au mur, à côté du guichet, un règlement est affiché.
+EOF
+    cat > "$d/reglement.txt" <<'EOF'
+        RÈGLEMENT INTÉRIEUR DE LA SALLE D'ATTENTE
+
+  Art. 1  Les patients attendent assis, en silence, que leur numéro
+          soit appelé. Chaque patient doit connaître son numéro.
+  Art. 2  Il est interdit d'entrer (cd) dans le guichet, sous les
+          chaises ou dans la poubelle. Ressortez-en aussitôt (cd ..).
+  Art. 3  Il est interdit de lire (cat) les papiers qui ne vous
+          appartiennent pas.
+  Art. 4  Certains objets ne sont pas destinés aux patients : leur nom
+          commence par un point et ils n'apparaissent pas à l'affichage
+          normal. Il est formellement interdit de les chercher (ls -a).
+  Art. 5  Les fenêtres sont décoratives. Ne grattez pas la peinture.
+  Art. 6  La porte de service (./porte_service.sh) est réservée au
+          personnel. Son code n'est communiqué à personne.
+
+                                                    La Direction
 EOF
     echo "NUMÉRO APPELÉ : $appel" > "$d/ecran_appel.txt"
     echo "Tic. Tac. Les aiguilles tournent, mais reviennent toujours sur $h h." > "$d/horloge.txt"
 
     for (( i = 1; i <= n; i++ )); do
-        printf 'Une chaise vide. Encore tiède.\n' > "$d/chaises/$(printf 'chaise_%02d' "$i")"
+        echo "Une chaise vide. Encore tiède." > "$d/chaises/$(printf 'chaise%02d' "$i")"
     done
-    echo "(1/3) ...compte les chaises qui t'attendent..." > "$d/chaises/.morceau_1"
+    echo "(1/3) ...compte les chaises qui t'attendent..." > "$d/chaises/.morceau1"
+
+    # Les fausses fenêtres : une seule cache un chiffre
+    nb_fenetres="$(alea 3 6)"
+    speciale="$(alea 1 "$nb_fenetres")"
+    for (( i = 1; i <= nb_fenetres; i++ )); do
+        if (( i == speciale )); then
+            printf 'Un ciel bleu, peint sur la vitre.\nDans un coin, la peinture s'"'"'écaille. Dessous, un chiffre gravé : %s\n' "$f" > "$d/fenetres/fenetre$i"
+        else
+            echo "Un ciel bleu, peint sur la vitre. Rien d'autre." > "$d/fenetres/fenetre$i"
+        fi
+    done
 
     cat > "$d/guichet/registre.txt" <<'EOF'
 REGISTRE DES ENTRÉES
@@ -51,13 +84,15 @@ REGISTRE DES ENTRÉES
 ~~~~~~~~~~~~  (rayé)
 ~~~~~~~~~~~~  (rayé)
 EOF
-    echo "(2/3) ...multiplie par l'heure qu'il est toujours..." > "$d/guichet/.morceau_2"
-    echo "(3/3) ...et écris juste derrière le numéro qu'on appelle. Présentez-vous à la porte de service." > "$d/poubelle/.morceau_3"
+    echo "(2/3) ...ajoute ce que cachent les fausses fenêtres, puis l'heure qu'il est toujours..." > "$d/guichet/.morceau2"
+    echo "(3/3) ...et écris juste derrière le numéro qu'on appelle. Présentez-vous à la porte de service." > "$d/poubelle/.morceau3"
     echo "Des gobelets vides, des tickets froissés. Tous illisibles." > "$d/poubelle/contenu.txt"
 
     cat > "$d/guichet/.tablette/ecran.txt" <<'EOF'
 Une tablette, posée derrière le guichet. L'écran est fissuré.
 Le compartiment de la batterie est vide.
+Au dos, quelqu'un a gravé à la pointe d'un couteau :
+    « Je l'ai laissée là où l'on m'a appelé. »
 EOF
     creer_action "$d/guichet/.tablette/allumer.sh" allumer
     creer_action "$d/porte_service.sh" porte_service
@@ -66,31 +101,34 @@ EOF
 # ---------------------------------------------------------------- Niveau 1
 generer_niveau1() {
     local base="$1" d="$1/ascenseur"
-    local m1 m2 x y i nom
+    local m1 m2 x y i
+    # y : l'étage de la batterie = le numéro appelé (17 à la première partie)
+    y="$(etat_get appel)"
+    # Deux boutons arrachés, entre 10 et 99 : le code, ce sont leurs numéros bout à bout
     m1="$(alea 10 99)"
+    while [ "$m1" = "$y" ]; do m1="$(alea 10 99)"; done
     m2="$(alea 10 99)"
-    while [ "$m2" = "$m1" ]; do m2="$(alea 10 99)"; done
+    while [ "$m2" = "$m1" ] || [ "$m2" = "$y" ]; do m2="$(alea 10 99)"; done
     (( m1 > m2 )) && { i="$m1"; m1="$m2"; m2="$i"; }
     etat_set code1 "$(empreinte "$m1$m2")"
 
+    # x : l'étage habité (la seule porte qui s'ouvre)
     x="$(alea 1 99)"
-    while [ "$x" = "$m1" ] || [ "$x" = "$m2" ]; do x="$(alea 1 99)"; done
-    y="$(alea 1 99)"
-    while [ "$y" = "$m1" ] || [ "$y" = "$m2" ] || [ "$y" = "$x" ]; do y="$(alea 1 99)"; done
+    while [ "$x" = "$m1" ] || [ "$x" = "$m2" ] || [ "$x" = "$y" ]; do x="$(alea 1 99)"; done
 
+    # Étages etage00 à etage99 (deux chiffres, pour que ls les range dans l'ordre)
     mkdir -p "$d"
     for (( i = 0; i <= 99; i++ )); do
         [ "$i" = "$m1" ] || [ "$i" = "$m2" ] && continue
-        if (( i == 0 )); then nom="etage_0"; else nom="$(printf 'etage_-%02d' "$i")"; fi
-        mkdir -p "$d/$nom"
-        echo "Ici, rien." > "$d/$nom/mur.txt"
-        echo "Une porte coupe-feu. Verrouillée." > "$d/$nom/porte.txt"
+        mkdir -p "$d/$(printf 'etage%02d' "$i")"
+        echo "Ici, rien." > "$d/$(printf 'etage%02d' "$i")/mur.txt"
+        echo "Une porte coupe-feu. Verrouillée." > "$d/$(printf 'etage%02d' "$i")/porte.txt"
     done
 
     # L'étage habité : un mur couvert d'écriture, et la seule porte qui s'ouvre
-    local habite; habite="$(printf 'etage_-%02d' "$x")"
+    local habite; habite="$(printf 'etage%02d' "$x")"
     local graffitis=(
-        "je suis déjà passé ici" "ne remonte pas" "IIII IIII IIII IIII" "combien de temps ?"
+        "je suis déjà passé ici" "ne redescends pas" "IIII IIII IIII IIII" "combien de temps ?"
         "la musique ne s'arrête jamais" "j'ai compté les étages. ils changent." "qui a écrit ça ?"
         "ne réponds pas au message" "ils sont tous pareils" "j'entends l'ascenseur bouger seul"
         "IIII IIII II" "je ne dors plus" "le néon grésille toujours au même rythme"
@@ -108,29 +146,43 @@ generer_niveau1() {
     echo "Une porte coupe-feu. Celle-ci n'est pas tout à fait fermée." > "$d/$habite/porte.txt"
     creer_action "$d/$habite/porte_coupe_feu.sh" porte_coupe_feu
 
-    # La batterie, oubliée sur un autre étage
-    echo "Une batterie de tablette. Elle semble encore un peu chargée." > "$d/$(printf 'etage_-%02d' "$y")/batterie"
+    # La batterie, cachée (fichier caché) à l'étage du numéro appelé
+    echo "Une batterie de tablette. Elle semble encore un peu chargée." > "$d/$(printf 'etage%02d' "$y")/.batterie"
 
     cat > "$d/regarder_autour.txt" <<'EOF'
 Une cabine d'ascenseur aux parois en miroir.
 Une musique d'attente tourne en boucle, toujours la même mesure.
-Le panneau compte de 0 à -99, mais certains boutons ont été arrachés,
+Le panneau compte de 0 à 99, mais deux boutons ont été arrachés,
 laissant des trous noirs.
 Chaque fois que les portes s'ouvrent, c'est le même palier :
 moquette grise, néon qui grésille, porte coupe-feu.
-Tout en bas du panneau, sous le -99, un bouton sans aucun numéro.
+Tout en haut du panneau, au-dessus du 99, un bouton sans aucun numéro.
 Il ne s'allume pas.
-(Pour aller à un étage : cd etage_-42)
+Une plaque de cuivre est vissée au-dessus des boutons.
+Sur le miroir, des inscriptions ont été gravées. L'écriture te dit vaguement quelque chose.
+
+(Pour aller à un étage : cd etage42)
 EOF
     cat > "$d/panneau.txt" <<'EOF'
-Boutons de 0 à -99. Certains ont été arrachés.
-Tout en bas, un bouton sans numéro.
+Boutons de 0 à 99. Deux ont été arrachés.
+Tout en haut, un bouton sans numéro.
 EOF
     cat > "$d/plaque.txt" <<'EOF'
 Une plaque de cuivre, vissée au-dessus des boutons :
 
     « Un seul étage a été habité.
       Ses murs ont trop parlé. »
+EOF
+    cat > "$d/graffitis.txt" <<'EOF'
+Gravé sur le miroir de la cabine, à hauteur d'yeux :
+
+  « un mur qui parle trop, ça pèse lourd. ls -l donne le poids. ls -S trie. »
+  « grep trouve un mot au milieu de mille »
+  « compte les boutons. ls ne ment pas : ce qui manque n'apparaît pas »
+  « je suis sorti à mon numéro. j'y ai caché ce qui manque à la tablette.
+    ce qui est caché commence par un point, ici comme en bas »
+  « pour emporter quelque chose : mv quoi où »
+  « le bouton du haut attend un mot. je ne l'ai jamais trouvé »
 EOF
     cat > "$d/indices_mode_facile.txt" <<'EOF'
 Lis un indice à la fois. Arrête-toi dès que tu as compris.
@@ -148,34 +200,35 @@ Regarde bien la liste des étages.
 
 
 INDICE 3
-Mets les boutons manquants bout à bout, du plus haut au plus bas.
+Mets les deux boutons manquants bout à bout, du plus petit au plus grand.
 EOF
     creer_action "$d/bouton_sans_numero.sh" bouton
 }
 
 # L'étage secret, créé par le bouton sans numéro
 generer_etage_404() {
-    local d; d="$(base_monde)/ascenseur/.etage_-404"
+    local d; d="$(base_monde)/ascenseur/.etage404"
     mkdir -p "$d"
     cat > "$d/regarder_autour.txt" <<'EOF'
 Les portes s'ouvrent sur un étage qui n'est pas sur le panneau.
 Pas de moquette. Pas de néon. Juste une chaise orange au milieu du noir,
 et une caméra posée dessus.
-À côté, un fichier. Il refuse de s'ouvrir tant qu'on ne lui en donne pas le droit.
+À côté, un fichier : verite.sh. Il refuse de s'ouvrir.
+Peut-être faut-il lui donner le droit de s'exécuter (chmod +x).
 EOF
     creer_action "$d/verite.sh" verite non
 }
 
 # ---------------------------------------------------------------- Niveau 2
 generer_niveau2() {
-    local base="$1" d="$1/couloir_hotel" i
+    local base="$1" d="$1/couloir" i
     mkdir -p "$d/porte_metro"
     etat_set coffre "$(empreinte 5281)"
     etat_set mdp "$(empreinte miroir)"
 
     for (( i = 201; i <= 299; i++ )); do
-        mkdir -p "$d/chambre_$i"
-        echo "Ne pas déranger." > "$d/chambre_$i/porte.txt"
+        mkdir -p "$d/chambre$i"
+        echo "Ne pas déranger." > "$d/chambre$i/porte.txt"
     done
     cat > "$d/regarder_autour.txt" <<'EOF'
 Un couloir d'hôtel. Moquette bordeaux à motifs, appliques murales jaunâtres.
@@ -186,6 +239,27 @@ Elle ne montre que de la neige. Le bruit remplit tout.
 Quelque chose brouille le signal.
 À côté, un coffre mural.
 Au bout du couloir, une porte marquée MÉTRO, avec une serrure.
+Sous la télévision, une notice plastifiée est scotchée au meuble.
+EOF
+    cat > "$d/notice_tv.txt" <<'EOF'
+        HÔTEL — NOTICE DU TÉLÉVISEUR D'ÉTAGE
+
+  Image brouillée ?
+    Un appareil de l'étage émet sans doute en continu.
+    La liste des appareils en fonctionnement s'affiche avec : ps aux
+    Elle est longue : filtrez-la avec | grep suivi d'un mot-clé.
+    Chaque appareil porte un numéro (PID, 2e colonne).
+    kill suivi de ce numéro met l'appareil hors tension.
+
+  Programmes
+    Ne zappez pas avant la fin : certaines informations passent très vite.
+    Vous pouvez relancer le téléviseur autant de fois que nécessaire.
+
+  Coffre mural
+    Le code est communiqué chaque soir aux clients, à la télévision.
+
+  Clés
+    Une clé ne s'utilise que dans sa serrure (mv clé serrure).
 EOF
     creer_action "$d/television.sh" television
     creer_action "$d/coffre.sh" coffre
@@ -208,25 +282,56 @@ arreter_brouillage() {
     return 0
 }
 
+# Vrai si le processus de brouillage tourne encore (un processus « zombie » compte comme arrêté)
 brouillage_actif() {
-    local pid; pid="$(etat_get brouillage_pid)"
-    [ -n "$pid" ] && kill -0 "$pid" 2> /dev/null
+    local pid etat_proc
+    pid="$(etat_get brouillage_pid)"
+    [ -n "$pid" ] || return 1
+    etat_proc="$(ps -p "$pid" -o stat= 2> /dev/null)"
+    [ -n "$etat_proc" ] && [[ "$etat_proc" != Z* ]]
 }
 
 # ---------------------------------------------------------------- Niveau 3
 generer_niveau3() {
-    local base="$1" d="$1/quai" bonne_voie bon_billet l i maintenant tmp
+    local base="$1" d="$1/metro" bonne_voie bon_billet l i maintenant tmp
     mkdir -p "$d/voies"
     bonne_voie="$(alea 1 3)"
-    etat_set voie "$(empreinte "voie_$bonne_voie")"
+    etat_set voie "$(empreinte "voie$bonne_voie")"
 
     cat > "$d/regarder_autour.txt" <<'EOF'
 Un quai de métro désert, carrelage blanc fissuré.
-Trois rames à l'arrêt, portes ouvertes, aucun conducteur.
-Le panneau d'affichage clignote sans rien afficher.
-Près d'un guichet fermé, un bac d'objets trouvés, scellé.
-À côté, un composteur.
+Trois rames à l'arrêt sur trois voies, portes ouvertes, aucun conducteur.
+Une seule partira. Le panneau d'affichage devrait dire laquelle.
+Il te faudra un billet. Les seuls billets ici sont dans le bac
+d'objets trouvés (objets_trouves.tar), scellé comme une archive.
+Près des voies, un composteur, et une borne d'information encore allumée.
 Une annonce sonore commence, puis s'arrête au milieu d'un mot.
+EOF
+    cat > "$d/borne_info.txt" <<'EOF'
+        RÉSEAU SOUTERRAIN — BORNE D'INFORMATION
+
+  1. OBJETS TROUVÉS
+     Les objets trouvés sont conservés dans une archive scellée.
+     Ouverture : tar -xvf suivi du nom de l'archive.
+
+  2. BILLETS
+     Tous les billets sont nominatifs : chacun porte le numéro de son
+     passager. Votre numéro vous a été attribué dès votre arrivée.
+     Un billet qui n'est pas à votre numéro ne vous mènera nulle part.
+     Astuce : grep cherche un texte dans plusieurs fichiers à la fois.
+
+  3. COMPOSTAGE
+     Composteur hors service. Un billet non composté n'a pas le droit
+     d'être exécuté. Compostez-le vous-même : chmod +x suivi du billet.
+
+  4. DÉPARTS
+     Panneau en panne. Rappel : seul le dernier train arrivé repart.
+     Chaque voie garde la date d'arrivée de sa rame (ls -lt la montre).
+
+  5. EMBARQUEMENT
+     Lancez votre billet en indiquant la voie : ./billet voie
+
+  Nous vous remercions de votre patience.
 EOF
     cat > "$d/panneau.txt" <<'EOF'
 —— HORS SERVICE ——
@@ -234,32 +339,37 @@ EOF
 (griffonné au marqueur, en dessous)
 Seul le dernier train arrivé repart. Les autres attendent.
 EOF
-    cat > "$d/composteur.txt" <<'EOF'
-Le composteur est en panne. Une étiquette jaunie :
-« En cas de panne, donnez vous-même à votre billet le droit de voyager. »
-EOF
-
     # Trois voies, arrivées à des heures différentes : la plus récente est la bonne
     maintenant="$(date +%s)"
     local ages=(7200 5400 3600) ordre=()
     for i in 1 2 3; do [ "$i" != "$bonne_voie" ] && ordre+=("$i"); done
-    echo "Une rame, portes ouvertes." > "$d/voies/voie_${ordre[0]}"
-    echo "Une rame, portes ouvertes." > "$d/voies/voie_${ordre[1]}"
-    echo "Une rame, portes ouvertes. Le moteur tourne encore." > "$d/voies/voie_$bonne_voie"
-    touch -d "@$(( maintenant - ages[0] ))" "$d/voies/voie_${ordre[0]}"
-    touch -d "@$(( maintenant - ages[1] ))" "$d/voies/voie_${ordre[1]}"
-    touch -d "@$(( maintenant - 60 ))" "$d/voies/voie_$bonne_voie"
+    echo "Une rame, portes ouvertes." > "$d/voies/voie${ordre[0]}"
+    echo "Une rame, portes ouvertes." > "$d/voies/voie${ordre[1]}"
+    echo "Une rame, portes ouvertes. Le moteur tourne encore." > "$d/voies/voie$bonne_voie"
+    touch -d "@$(( maintenant - ages[0] ))" "$d/voies/voie${ordre[0]}"
+    touch -d "@$(( maintenant - ages[1] ))" "$d/voies/voie${ordre[1]}"
+    touch -d "@$(( maintenant - 60 ))" "$d/voies/voie$bonne_voie"
 
-    # Les objets trouvés : six billets dont un seul valable
+    # Les objets trouvés : six billets nominatifs, un seul au numéro du joueur
+    local appel numeros=() num deja
+    appel="$(etat_get appel)"
     tmp="$(mktemp -d)"
     bon_billet="$(echo A B C D E F | tr ' ' '\n' | sed -n "$(alea 1 6)p")"
     etat_set billet "$(empreinte "$bon_billet")"
     for l in A B C D E F; do
         if [ "$l" = "$bon_billet" ]; then
-            creer_action "$tmp/billet_$l.sh" "billet $l" non "# Validité : valable"
+            num="$appel"
         else
-            creer_action "$tmp/billet_$l.sh" "billet $l" non "# Validité : périmé"
+            # un autre numéro à deux chiffres, différent de celui du joueur et des autres
+            while :; do
+                num="$(alea 10 99)"
+                deja=0
+                for i in "${numeros[@]}" "$appel"; do [ "$i" = "$num" ] && deja=1; done
+                [ "$deja" = 0 ] && break
+            done
         fi
+        numeros+=("$num")
+        creer_action "$tmp/billet$l.sh" "billet $l" non "# Billet nominatif — Passager n° $num"
     done
     echo "Un parapluie noir. Sec. Il ne pleut jamais ici." > "$tmp/parapluie.txt"
     tar -cf "$d/objets_trouves.tar" -C "$tmp" .

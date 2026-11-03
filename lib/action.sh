@@ -34,7 +34,7 @@ action_porte_service() {
     if verifier_code code0 "$code"; then
         succes "Un déclic. La porte de service s'ouvre."
         narrer "Derrière, une cabine d'ascenseur. Les portes se referment derrière toi."
-        narrer "Le panneau compte jusqu'à -99."
+        narrer "Le panneau compte de 0 à 99."
         [ -d "$(base_monde)/ascenseur" ] || generer_niveau1 "$(base_monde)"
         etat_set niveau 1
         bandeau "NIVEAU 1 · L'ASCENSEUR"
@@ -51,10 +51,10 @@ action_porte_coupe_feu() {
     if verifier_code code1 "$code"; then
         succes "La porte coupe-feu cède."
         narrer "Derrière, un couloir moquetté. Quelque part, une télévision grésille."
-        [ -d "$(base_monde)/couloir_hotel" ] || generer_niveau2 "$(base_monde)"
+        [ -d "$(base_monde)/couloir" ] || generer_niveau2 "$(base_monde)"
         etat_set niveau 2
-        bandeau "NIVEAU 2 · LE COULOIR D'HÔTEL"
-        piste "→ cd ../../couloir_hotel"
+        bandeau "NIVEAU 2 · LE COULOIR"
+        piste "→ cd ../../couloir"
     else
         echec "La poignée ne bouge pas."
     fi
@@ -92,7 +92,7 @@ action_television() {
 }
 
 action_coffre() {
-    local d; d="$(base_monde)/couloir_hotel"
+    local d; d="$(base_monde)/couloir"
     echo
     if [ -f "$d/cle" ] || [ -f "$d/porte_metro/cle" ]; then
         narrer "Le coffre est ouvert. Il est vide."
@@ -110,7 +110,7 @@ action_coffre() {
 }
 
 action_ouvrir() {
-    local d; d="$(base_monde)/couloir_hotel"
+    local d; d="$(base_monde)/couloir"
     echo
     if [ ! -f "$d/porte_metro/cle" ]; then
         echec "La porte est verrouillée. Il faudrait mettre une clé dans la serrure."
@@ -118,27 +118,27 @@ action_ouvrir() {
     fi
     succes "La serrure cède."
     narrer "Un escalier mécanique à l'arrêt descend vers un quai. Une rame attend, portes ouvertes."
-    [ -d "$(base_monde)/quai" ] || generer_niveau3 "$(base_monde)"
+    [ -d "$(base_monde)/metro" ] || generer_niveau3 "$(base_monde)"
     etat_set niveau 3
-    bandeau "NIVEAU 3 · LE QUAI"
-    piste "→ cd ../../quai"
+    bandeau "NIVEAU 3 · LE MÉTRO"
+    piste "→ cd ../../metro"
 }
 
 action_billet() {
     local lettre="$1" voie="${2:-}"
     echo
     if [ "$(empreinte "$lettre")" != "$(etat_get billet)" ]; then
-        echec "Le composteur rejette ton billet. Il est périmé."
+        echec "Ce billet n'est pas à ton numéro. Les portes refusent de s'ouvrir."
         return
     fi
     if [ -z "$voie" ]; then
-        piste "Quelle voie ? (exemple : ./billet_$lettre.sh voie_1)"
+        piste "Quelle voie ? (exemple : ./billet$lettre.sh voie1)"
         return
     fi
     voie="$(basename "$voie")"
     if [ "$(empreinte "$voie")" = "$(etat_get voie)" ]; then
         fin_normale
-    elif [ -f "$(base_monde)/quai/voies/$voie" ]; then
+    elif [ -f "$(base_monde)/metro/voies/$voie" ]; then
         fin_ratee train
     else
         echec "Il n'y a pas de $voie ici."
@@ -148,7 +148,7 @@ action_billet() {
 action_allumer() {
     local d; d="$(base_monde)/salle_attente/guichet/.tablette"
     echo
-    if [ ! -f "$d/batterie" ]; then
+    if [ ! -f "$d/.batterie" ] && [ ! -f "$d/batterie" ]; then
         echec "L'écran reste noir. Le compartiment de la batterie est vide."
         return
     fi
@@ -176,7 +176,7 @@ action_bouton() {
     mot="$(demander ">")"
     echo
     if [ "$(normaliser "$mot")" = "verite" ]; then
-        mystere "Le bouton s'allume. L'ascenseur descend, longtemps. Bien plus bas que -99."
+        mystere "Le bouton s'allume. L'ascenseur monte, longtemps. Bien plus haut que 99."
         mystere "Les portes s'ouvrent sur un étage qui n'est pas sur le panneau."
         generer_etage_404
         bandeau "NIVEAU ? · ???" "$COUL_MYSTERE"

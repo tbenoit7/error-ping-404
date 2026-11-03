@@ -115,8 +115,8 @@ etat_set debut "$(date +%s)"
 case "$NIVEAU_DEPART" in
     0) depart="$JEU_ROOT/monde/salle_attente"; titre="NIVEAU 0 · LA SALLE D'ATTENTE" ;;
     1) depart="$JEU_ROOT/monde/ascenseur";     titre="NIVEAU 1 · L'ASCENSEUR" ;;
-    2) depart="$JEU_ROOT/monde/couloir_hotel"; titre="NIVEAU 2 · LE COULOIR D'HÔTEL" ;;
-    3) depart="$JEU_ROOT/monde/quai";          titre="NIVEAU 3 · LE QUAI" ;;
+    2) depart="$JEU_ROOT/monde/couloir"; titre="NIVEAU 2 · LE COULOIR" ;;
+    3) depart="$JEU_ROOT/monde/metro";   titre="NIVEAU 3 · LE MÉTRO" ;;
 esac
 bandeau "$titre"
 

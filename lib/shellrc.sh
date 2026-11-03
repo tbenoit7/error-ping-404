@@ -12,11 +12,11 @@ alias grep='grep --color=auto'
 # Nom du lieu, déduit du dossier courant
 __jeu_lieu() {
     case "$PWD" in
-        *"/.etage_-404"*)     echo "Niveau ? · ???" ;;
+        *"/.etage404"*)       echo "Niveau ? · ???" ;;
         *"/salle_attente"*)   echo "Niveau 0 · La salle d'attente" ;;
         *"/ascenseur"*)       echo "Niveau 1 · L'ascenseur" ;;
-        *"/couloir_hotel"*)   echo "Niveau 2 · Le couloir d'hôtel" ;;
-        *"/quai"*)            echo "Niveau 3 · Le quai" ;;
+        *"/couloir"*)         echo "Niveau 2 · Le couloir" ;;
+        *"/metro"*)           echo "Niveau 3 · Le métro" ;;
         *)                    echo "Hors des murs" ;;
     esac
 }
