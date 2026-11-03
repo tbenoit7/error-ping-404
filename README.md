@@ -23,7 +23,7 @@ Chaque lieu est un dossier, chaque objet est un fichier. Pour avancer, tu fouill
 
 Une partie dure **30 minutes**. Le temps restant et le lieu où tu te trouves s'affichent en permanence au-dessus de la ligne de commande. Les codes changent à chaque partie.
 
-Il existe **trois fins** : sortir, échouer… et une troisième, pour ceux qui fouillent vraiment partout.
+Il existe **trois fins** : une fin normale, une mauvaise fin… et une vraie fin, pour ceux qui fouillent vraiment partout.
 
 ## Prérequis
 
@@ -35,7 +35,7 @@ Il existe **trois fins** : sortir, échouer… et une troisième, pour ceux qui 
 
 ```bash
 git clone https://github.com/tbenoit7/error-ping-404
-cd error_ping_404/
+cd error-ping-404/
 ```
 
 ## Jouer
