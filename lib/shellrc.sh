@@ -61,5 +61,5 @@ __jeu_prompt() {
 }
 PROMPT_COMMAND=__jeu_prompt
 
-piste "Vérifie bien à regarder partout et à ne rien oublier..."
-piste "(cat regarder_autour.txt)"
+piste "Pense à tout fouiller. Pour commencer, regarde autour de toi :"
+piste "    cat regarder_autour.txt"

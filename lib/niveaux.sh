@@ -26,34 +26,53 @@ generer_niveau0() {
 
     mkdir -p "$d/chaises" "$d/fenetres" "$d/guichet/.tablette" "$d/poubelle"
 
-    cat > "$d/regarder_autour.txt" <<'EOF'
-Une salle d'attente d'un blanc aveuglant. Une odeur de produits d'entretien.
+    cat > "$d/regarder_autour.txt" <<EOF
+Vous voyez :
+
 Des rangées de chaises en plastique, toutes vides.
+
 Aux murs, de grandes fenêtres. Derrière, un ciel parfaitement bleu.
 Trop parfait. Ce ne sont pas de vraies fenêtres.
+
 L'horloge murale fait tic, tac.
+
 Au-dessus du guichet, l'écran d'appel affiche un numéro.
 Personne derrière la vitre. Sur la vitre, quelqu'un a écrit au feutre :
-    TOUT EST COMPTÉ ICI.
-Au fond, une porte de service, avec un clavier à code.
-Une poubelle déborde près de l'entrée.
-Au mur, à côté du guichet, un règlement est affiché.
-EOF
-    cat > "$d/reglement.txt" <<'EOF'
-        RÈGLEMENT INTÉRIEUR DE LA SALLE D'ATTENTE
 
-  Art. 1  Les patients attendent assis, en silence, que leur numéro
-          soit appelé. Chaque patient doit connaître son numéro.
-  Art. 2  Il est interdit d'entrer (cd) dans le guichet, sous les
-          chaises ou dans la poubelle. Ressortez-en aussitôt (cd ..).
-  Art. 3  Il est interdit de lire (cat) les papiers qui ne vous
-          appartiennent pas.
-  Art. 4  Certains objets ne sont pas destinés aux patients : leur nom
-          commence par un point et ils n'apparaissent pas à l'affichage
-          normal. Il est formellement interdit de les chercher (ls -a).
-  Art. 5  Les fenêtres sont décoratives. Ne grattez pas la peinture.
-  Art. 6  La porte de service (./porte_service.sh) est réservée au
-          personnel. Son code n'est communiqué à personne.
+    ${ROUGE}${GRAS}TOUT EST COMPTÉ ICI.${RESET}
+
+Au fond, une porte de service, avec un clavier à code.
+
+Une poubelle déborde près de l'entrée.
+
+Au mur, à côté du guichet, un guide est affiché.
+EOF
+    cat > "$d/guide_patient.txt" <<'EOF'
+        GUIDE DU PATIENT — SALLE D'ATTENTE
+
+  1. VOTRE NUMÉRO
+     Chaque patient reçoit un numéro, affiché sur l'écran d'appel.
+     Retenez-le bien : il vous suivra tout au long de votre parcours.
+
+  2. SE DÉPLACER
+     Pour vous approcher d'un élément de la salle (les chaises, les
+     fenêtres, le guichet, la poubelle) : cd suivi de son nom.
+     Pour revenir au milieu de la salle : cd ..
+
+  3. LIRE
+     Les papiers, écrans et inscriptions se lisent avec cat.
+     Pour voir ce qui se trouve autour de vous : ls
+
+  4. INDICES INVISIBLES
+     Certains indices sont invisibles à l'œil nu : leur nom commence
+     par un point, et ls ne les montre pas. Des lunettes à infrarouge
+     sont à la disposition des patients : ls -a
+     Pensez à les porter partout où vous allez.
+
+  5. PORTE DE SERVICE
+     Elle s'ouvre avec ./porte_service.sh, à condition d'en connaître
+     le code. Un ticket a été déchiré en trois indices et dispersé
+     dans la salle. Réunis, ils expliquent comment le calculer.
 
                                                     La Direction
 EOF
@@ -63,7 +82,7 @@ EOF
     for (( i = 1; i <= n; i++ )); do
         echo "Une chaise vide. Encore tiède." > "$d/chaises/$(printf 'chaise%02d' "$i")"
     done
-    echo "(1/3) ...compte les chaises qui t'attendent..." > "$d/chaises/.morceau1"
+    echo "(1/3) ...compte les chaises qui t'attendent..." > "$d/chaises/.indice1"
 
     # Les fausses fenêtres : une seule cache un chiffre
     nb_fenetres="$(alea 3 6)"
@@ -84,8 +103,8 @@ REGISTRE DES ENTRÉES
 ~~~~~~~~~~~~  (rayé)
 ~~~~~~~~~~~~  (rayé)
 EOF
-    echo "(2/3) ...ajoute ce que cachent les fausses fenêtres, puis l'heure qu'il est toujours..." > "$d/guichet/.morceau2"
-    echo "(3/3) ...et écris juste derrière le numéro qu'on appelle. Présentez-vous à la porte de service." > "$d/poubelle/.morceau3"
+    echo "(2/3) ...ajoute ce que cachent les fausses fenêtres, puis l'heure qu'il est toujours..." > "$d/guichet/.indice2"
+    echo "(3/3) ...et écris juste derrière le numéro qu'on appelle. Présentez-vous à la porte de service." > "$d/poubelle/.indice3"
     echo "Des gobelets vides, des tickets froissés. Tous illisibles." > "$d/poubelle/contenu.txt"
 
     cat > "$d/guichet/.tablette/ecran.txt" <<'EOF'
