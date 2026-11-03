@@ -14,6 +14,33 @@ creer_action() {
     if [ "$executable" = "oui" ]; then chmod 755 "$fichier"; else chmod 644 "$fichier"; fi
 }
 
+# ---------------------------------------------------------------- Accueil des niveaux
+# Rappel des réflexes à l'arrivée dans un lieu : accueil_niveau 0|1|2|3|404
+accueil_niveau() {
+    echo
+    case "$1" in
+        0)
+            piste "Pense à tout fouiller. Pour commencer, regarde autour de toi :"
+            piste "ls et cat regarder_autour.txt seront tes premiers repères." ;;
+        1)
+            piste "Nouveau lieu, mêmes réflexes : ls, cat regarder_autour.txt,"
+            piste "et tes lunettes infrarouges (ls -a) partout où tu passes."
+            piste "Ici, certains fichiers pèsent plus lourd que d'autres (ls -l)."
+            mystere "La tablette du guichet n'a pas dit son dernier mot..." ;;
+        2)
+            piste "Mêmes réflexes : ls, cat regarder_autour.txt."
+            piste "Ici, ce qui te bloque n'est pas un fichier : c'est un programme"
+            piste "qui tourne quelque part (ps aux)."
+            mystere "As-tu trouvé ce qui manquait à la tablette ?" ;;
+        3)
+            piste "Mêmes réflexes : ls, cat regarder_autour.txt."
+            piste "La borne d'information connaît la marche à suivre."
+            mystere "Avant de monter dans un train, demande-toi si tu as tout vu." ;;
+        404)
+            mystere "Ici, rien ne s'exécute sans ta permission (chmod +x)." ;;
+    esac
+}
+
 # ---------------------------------------------------------------- Niveau 0
 generer_niveau0() {
     local base="$1" d="$1/niveau0_salle_attente"
@@ -317,7 +344,7 @@ EOF
     creer_action "$d/coffre.sh" coffre
     echo "Une serrure. Il faudrait y mettre une clé." > "$d/porte_metro/serrure.txt"
     creer_action "$d/porte_metro/ouvrir.sh" ouvrir
-    demarrer_brouillage "$d/$chambre/emetteur"
+    demarrer_brouillage "$d/$chambre/emetteur_brouillage"
 }
 
 # Lance l'émetteur en arrière-plan : demarrer_brouillage chemin_du_script

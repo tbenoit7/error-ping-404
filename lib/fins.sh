@@ -95,9 +95,84 @@ fin_secrete() {
     etat_set debut "$(date +%s)"
     generer_niveau0 "$base"
     etat_set aller "$base/niveau0_salle_attente"
+    etat_set revelation 1   # la prochaine commande du joueur déclenche la révélation finale
 
     mystere "Tu ouvres les yeux. Une odeur de produits d'entretien, un blanc aveuglant..."
     pause 1
     echo
     danger "Tu as déjà vu cette salle. Tape pwd."
+}
+
+# Dernière révélation : déclenchée par la première commande tapée dans la boucle (le pwd)
+fin_revelation() {
+    local n deja suivant
+    n="$(etat_get appel)"
+    deja=$(( n - 1 ))
+    suivant=$(( n + 1 ))
+    local VITESSE=0.05
+
+    pause 2
+    echo
+    mystere "Le chemin ne ment pas. boucle_$n."
+    pause 2
+    mystere "Tu repenses à l'écran d'appel, la première fois. Il affichait $deja."
+    mystere "Tu as cru que c'était ton numéro."
+    pause 1
+    danger "Ce n'était pas un numéro. C'était un compte."
+    pause 2
+    echo
+    narrer "$deja fois, tu t'es réveillé dans cette salle."
+    narrer "$deja fois, tu as compté les chaises, gratté les fenêtres, tué le brouillage."
+    narrer "$deja fois, tu as pris le dernier train, et tu as cru être sorti."
+    pause 2
+    echo
+    VITESSE=0.08
+    mystere "Il n'y a pas de sortie. Il n'y en a jamais eu."
+    mystere "Il n'y a que toi, qui reviens toujours."
+    pause 2
+    echo
+    VITESSE=0.05
+    narrer "Tu t'assois sur une chaise orange. Devant toi, un écran s'allume."
+    narrer "Tes mains se posent sur le clavier. Elles savent déjà quoi écrire."
+    pause 2
+    echo
+    echo "$MARGE${FOND_GRIS} Nouveau message ─────────────────────────────── ${RESET}"
+    echo "${MARGE}À       : ████████@█████"
+    echo "${MARGE}Objet   : Error: Ping 404 (run_away.exe)"
+    echo
+    VITESSE=0.04
+    narrer "Je ne sais pas si ce message parviendra à quelqu'un."
+    narrer "Mais, si c'est le cas... aidez-moi s'il vous plaît."
+    narrer "..."
+    narrer "Tu es le seul à qui j'ai pu écrire !"
+    pause 1
+    echo
+    echo "$MARGE$COUL_SUCCES[ Message envoyé ]$RESET"
+    pause 3
+    glitch
+    echo
+    VITESSE=0.15
+    echo "        ${ROUGE}${GRAS}NUMÉRO APPELÉ : $suivant${RESET}"
+    pause 2
+    echo
+    VITESSE=0.05
+    mystere "Quelque part, quelqu'un vient d'ouvrir les yeux."
+    mystere "Une odeur de produits d'entretien. Un blanc aveuglant. Un tic d'horloge."
+    pause 2
+    echo
+    echo "${COUL_MYSTERE}${GRAS}"
+    cat <<'EOF'
+   ██████   ██████  ██    ██  ██████ ██      ███████
+   ██   ██ ██    ██ ██    ██ ██      ██      ██
+   ██████  ██    ██ ██    ██ ██      ██      █████
+   ██   ██ ██    ██ ██    ██ ██      ██      ██
+   ██████   ██████   ██████   ██████ ███████ ███████
+EOF
+    echo "${RESET}"
+    echo "$MARGE${COUL_MYSTERE}━━━━━━━━━━━━━━  FIN SECRÈTE  ━━━━━━━━━━━━━━${RESET}"
+    echo
+    VITESSE=0.08
+    mystere "        Ne réponds pas au prochain message."
+    echo
+    terminer_partie
 }

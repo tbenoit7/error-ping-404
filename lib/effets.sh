@@ -64,19 +64,31 @@ pause() {
     sleep "$1"
 }
 
-# Écran brouillé pendant ~1 seconde
+# Écran brouillé : des lignes de parasites décalées, traversées de fragments
+# de messages corrompus, puis une ligne d'erreur
 glitch() {
-    local caracteres='#@%&$*!?<>/=+~^01ABCDEFXYZ' couleurs=("$ROUGE" "$VERT" "$CYAN" "$BLANC")
-    local ligne n i largeur=60
+    local caracteres='#@%&$*!?<>/=+~^01ABCDEFXYZ' couleurs=("$ROUGE" "$VERT" "$CYAN" "$MAGENTA" "$BLANC")
+    local fragments=("ERROR" "PING 404" "NO SIGNAL" "run_away.exe" "0x404" "SEGFAULT" "?????" "LOOP" "/dev/null" "RECONNEXION")
+    local ligne n i largeur decalage pos frag
     printf '\a'
-    for (( n = 0; n < 18; n++ )); do
+    for (( n = 0; n < 16; n++ )); do
+        largeur=$(( 20 + RANDOM % 50 ))
+        decalage=$(( RANDOM % 12 ))
         ligne=""
         for (( i = 0; i < largeur; i++ )); do
             ligne+="${caracteres:RANDOM % ${#caracteres}:1}"
         done
-        printf '%s%s%s\n' "${couleurs[RANDOM % 4]}" "$ligne" "$RESET"
-        sleep 0.05
+        # Une fois sur trois, un fragment de message vient s'incruster
+        if (( RANDOM % 3 == 0 )); then
+            frag="${fragments[RANDOM % ${#fragments[@]}]}"
+            pos=$(( RANDOM % (largeur - ${#frag} + 1) ))
+            ligne="${ligne:0:pos}${RESET}${GRAS}${BLANC} $frag ${RESET}${couleurs[RANDOM % 5]}${ligne:pos+${#frag}+2}"
+        fi
+        printf '%*s%s%s%s\n' "$decalage" '' "${couleurs[RANDOM % 5]}" "$ligne" "$RESET"
+        sleep 0.04
     done
+    printf '\n%s%s  ░▒▓█  ERROR : PING 404  █▓▒░  %s\n' "$MARGE" "$ROUGE$GRAS" "$RESET"
+    sleep 0.6
 }
 
 # Neige de télévision pendant ~3 secondes

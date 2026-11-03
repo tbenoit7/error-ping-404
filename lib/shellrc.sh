@@ -38,6 +38,11 @@ __jeu_prompt() {
         etat_set aller ""
         cd "$aller" || true
     fi
+    # Fin secrète : la première commande tapée dans la boucle (le pwd) déclenche la révélation
+    case "$(etat_get revelation)" in
+        1) etat_set revelation 2 ;;
+        2) etat_set revelation 3; fin_revelation ;;
+    esac
     # Partie terminée : on quitte le shell de jeu
     if [ "$(etat_get fini)" = "1" ]; then
         echo
@@ -61,5 +66,4 @@ __jeu_prompt() {
 }
 PROMPT_COMMAND=__jeu_prompt
 
-piste "Pense à tout fouiller. Pour commencer, regarde autour de toi :"
-piste "    cat regarder_autour.txt"
+accueil_niveau "$(etat_get niveau)"

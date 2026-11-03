@@ -40,6 +40,7 @@ action_porte_service() {
         bandeau "NIVEAU 1 · L'ASCENSEUR"
         etat_set aller "$(base_monde)/niveau1_ascenseur"
         piste "(Tu entres dans l'ascenseur : dossier niveau1_ascenseur/)"
+        accueil_niveau 1
     else
         echec "Le clavier bipe. Une étiquette : « Le code est sur votre ticket. »"
     fi
@@ -57,6 +58,7 @@ action_porte_coupe_feu() {
         bandeau "NIVEAU 2 · LE COULOIR"
         etat_set aller "$(base_monde)/niveau2_couloir"
         piste "(Tu entres dans le couloir : dossier niveau2_couloir/)"
+        accueil_niveau 2
     else
         echec "La poignée ne bouge pas."
     fi
@@ -125,6 +127,7 @@ action_ouvrir() {
     bandeau "NIVEAU 3 · LE MÉTRO"
     etat_set aller "$(base_monde)/niveau3_metro"
     piste "(Tu descends sur le quai : dossier niveau3_metro/)"
+    accueil_niveau 3
 }
 
 action_billet() {
@@ -185,6 +188,7 @@ action_bouton() {
         bandeau "NIVEAU ? · ???" "$COUL_MYSTERE"
         etat_set aller "$(base_monde)/niveau1_ascenseur/.etage404"
         piste "(Tu sors de la cabine : dossier .etage404/)"
+        accueil_niveau 404
     else
         narrer "Rien ne se passe."
     fi
