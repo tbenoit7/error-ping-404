@@ -126,6 +126,6 @@ bandeau "$titre"
 # ---------------------------------------------------------------- Après la partie
 arreter_brouillage
 echo
-piste "Merci d'avoir joué à Error Ping 404."
+piste "Merci d'avoir joué à Error: Ping 404 ^^"
 echo
 read -r -p "$MARGE$COUL_PISTE[ Appuie sur Entrée pour quitter ]$RESET "

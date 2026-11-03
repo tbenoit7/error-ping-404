@@ -23,7 +23,7 @@ Chaque lieu est un dossier, chaque objet est un fichier. Pour avancer, tu fouill
 
 Une partie dure **30 minutes**. Le temps restant et le lieu où tu te trouves s'affichent en permanence au-dessus de la ligne de commande. Les codes changent à chaque partie.
 
-Il existe **trois fins** : sortir (normal ending), échouer (bad ending)... et une true ending, pour ceux qui fouillent vraiment partout.
+Il existe **trois fins** : sortir, échouer… et une troisième, pour ceux qui fouillent vraiment partout.
 
 ## Prérequis
 
@@ -35,7 +35,7 @@ Il existe **trois fins** : sortir (normal ending), échouer (bad ending)... et u
 
 ```bash
 git clone https://github.com/tbenoit7/error-ping-404
-cd error-ping-404
+cd error_ping_404/
 ```
 
 ## Jouer
@@ -45,9 +45,9 @@ cd error-ping-404
 ```
 
 - Lis le mail, puis appuie sur **Entrée**.
-- Commence toujours par regarder autour de toi : `ls` et `cat regarder_autour.txt` seront tes meilleurs amis.
+- Commence toujours par regarder autour de toi : `ls` et `cat regarder_autour.txt`.
 - Quand tu réussis un niveau, tu es directement emmené au suivant.
-- `exit` arrête la partie.
+- `exit` arrête la partie en cours.
 
 | Commande | Effet |
 | --- | --- |
@@ -57,12 +57,17 @@ cd error-ping-404
 
 Pendant la partie, le terminal passe en fond noir. Ses couleurs d'origine reviennent à la fin.
 
+## Solution
+
+Bloqué ? La solution complète, niveau par niveau et fin secrète comprise, se trouve dans [SOLUTION.md](SOLUTION.md). Attention, spoilers.
+
 ## Structure du projet
 
 ```
 error_ping_404/
 ├── lancer.sh          lancement, intro, shell de jeu
 ├── reinitialiser.sh   remise à zéro
+├── SOLUTION.md        solution complète (spoilers)
 └── lib/
     ├── etat.sh        état de la partie, compte à rebours, vérification des codes
     ├── effets.sh      couleurs, effet machine à écrire, glitch
@@ -72,10 +77,10 @@ error_ping_404/
     └── shellrc.sh     prompt et compte à rebours du shell de jeu
 ```
 
-Le dossier `niveaux/`, créé à chaque partie, contient le monde du joueur. Chaque niveau n'est généré qu'une fois le précédent réussi, et les codes sont vérifiés par empreinte `sha256sum` : ils ne sont jamais écrits en clair.
+Chaque niveau n'est généré qu'une fois le précédent réussi, et les codes sont vérifiés par empreinte `sha256sum` : ils ne sont jamais écrits en clair.
 
 ## Contexte
 
-Projet réalisé dans le cadre du cours de Passeport Informatique, en 3e année de Télécommunications à l'INSA Lyon. Il s'inspire de *Keep Talking and Nobody Explodes — UNIX version*, utilisé en cours pour découvrir le terminal.
+Projet réalisé dans le cadre du cours de Passeport Informatique, en 3e année de Télécommunications à l'INSA Lyon. Il s'inspire de *Keep Talking and Nobody Explodes — UNIX version*, utilisé en cours pour découvrir le terminal, et surtout de l'histoire des Backrooms pour la narration.
 
-Auteur : Tamatoa BENOIT (assisté par Claude.ai)
+Auteur : Tamatoa BENOIT (assisted by Claude.ai)

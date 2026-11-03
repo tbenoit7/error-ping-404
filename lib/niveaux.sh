@@ -72,7 +72,8 @@ Au fond, une porte de service, avec un clavier à code.
 
 Une poubelle déborde près de l'entrée.
 
-Au mur, à côté du guichet, un guide est affiché.
+Au mur, à côté du guichet, un guide est affiché. Les nouveaux patients
+feraient bien de le lire avant toute chose (guide_patient.txt).
 EOF
     cat > "$d/guide_patient.txt" <<'EOF'
         GUIDE DU PATIENT — SALLE D'ATTENTE
@@ -216,6 +217,7 @@ Tout en haut du panneau, au-dessus du 99, un bouton sans aucun numéro.
 Il ne s'allume pas.
 Une plaque de cuivre est vissée au-dessus des boutons.
 Sur le miroir, des inscriptions ont été gravées. L'écriture te dit vaguement quelque chose.
+On dirait qu'elles ont été laissées pour quelqu'un comme toi (graffitis.txt).
 
 (Pour aller à un étage : cd etage42)
 EOF
@@ -317,6 +319,7 @@ Quelque chose brouille le signal.
 À côté, un coffre mural.
 Au bout du couloir, une porte marquée MÉTRO, avec une serrure.
 Sous la télévision, une notice plastifiée est scotchée au meuble.
+Elle explique quoi faire quand l'image est brouillée (notice_tv.txt).
 Une des chambres a sa porte entrouverte. Il en sort un grésillement.
 EOF
     cat > "$d/notice_tv.txt" <<'EOF'
@@ -385,6 +388,7 @@ Une seule partira. Le panneau d'affichage devrait dire laquelle.
 Il te faudra un billet. Les seuls billets ici sont dans le bac
 d'objets trouvés (objets_trouves.tar), scellé comme une archive.
 Près des voies, un composteur, et une borne d'information encore allumée.
+Les voyageurs perdus commencent toujours par elle (borne_info.txt).
 Une annonce sonore commence, puis s'arrête au milieu d'un mot.
 EOF
     cat > "$d/borne_info.txt" <<'EOF'
