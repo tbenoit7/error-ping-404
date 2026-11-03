@@ -35,10 +35,11 @@ action_porte_service() {
         succes "Un déclic. La porte de service s'ouvre."
         narrer "Derrière, une cabine d'ascenseur. Les portes se referment derrière toi."
         narrer "Le panneau compte de 0 à 99."
-        [ -d "$(base_monde)/ascenseur" ] || generer_niveau1 "$(base_monde)"
+        [ -d "$(base_monde)/niveau1_ascenseur" ] || generer_niveau1 "$(base_monde)"
         etat_set niveau 1
         bandeau "NIVEAU 1 · L'ASCENSEUR"
-        piste "→ cd ../ascenseur"
+        etat_set aller "$(base_monde)/niveau1_ascenseur"
+        piste "(Tu entres dans l'ascenseur : dossier niveau1_ascenseur/)"
     else
         echec "Le clavier bipe. Une étiquette : « Le code est sur votre ticket. »"
     fi
@@ -51,10 +52,11 @@ action_porte_coupe_feu() {
     if verifier_code code1 "$code"; then
         succes "La porte coupe-feu cède."
         narrer "Derrière, un couloir moquetté. Quelque part, une télévision grésille."
-        [ -d "$(base_monde)/couloir" ] || generer_niveau2 "$(base_monde)"
+        [ -d "$(base_monde)/niveau2_couloir" ] || generer_niveau2 "$(base_monde)"
         etat_set niveau 2
         bandeau "NIVEAU 2 · LE COULOIR"
-        piste "→ cd ../../couloir"
+        etat_set aller "$(base_monde)/niveau2_couloir"
+        piste "(Tu entres dans le couloir : dossier niveau2_couloir/)"
     else
         echec "La poignée ne bouge pas."
     fi
@@ -68,7 +70,6 @@ action_television() {
         echec "Le signal est brouillé. Quelque chose, quelque part, émet en continu."
         return
     fi
-    clear
     echo "$MARGE${BLEU}══════════════════════════════════════════════════════${RESET}"
     echo "$MARGE${GRAS}   CANAL 0  •  LE JOURNAL DE LA NUIT${RESET}"
     echo "$MARGE${BLEU}══════════════════════════════════════════════════════${RESET}"
@@ -82,17 +83,18 @@ action_television() {
     echo
     ecrire "$MARGE Merci de votre patience. Votre attente est importante." "$CYAN"
     pause 1
-    # Une ligne qui n'a rien à faire là, une demi-seconde
-    printf '%s' "$MARGE${ROUGE}${GRAS}        regarde-toi dans le MIROIR${RESET}"
-    sleep 0.5
-    printf '\r%60s\r' ''
+    # Une ligne qui n'a rien à faire là : le mot de passe de la tablette
+    echo
+    echo "$MARGE${COUL_MYSTERE}      ▒▒░░ ~ ~ ~ ░░▒▒ ~ ~ ░▒▒░ ~ ~ ~ ▒░░▒${RESET}"
+    ecrire "$MARGE         regarde-toi dans le MIROIR" "$COUL_MYSTERE$GRAS"
+    echo "$MARGE${COUL_MYSTERE}      ▒░░▒ ~ ~ ░▒▒░ ~ ~ ~ ░░▒▒ ~ ~ ~ ▒▒░░${RESET}"
     echo
     echo "$MARGE${BLEU}══════════════════════════════════════════════════════${RESET}"
     echo "$MARGE${GRIS}                    Fin des programmes.${RESET}"
 }
 
 action_coffre() {
-    local d; d="$(base_monde)/couloir"
+    local d; d="$(base_monde)/niveau2_couloir"
     echo
     if [ -f "$d/cle" ] || [ -f "$d/porte_metro/cle" ]; then
         narrer "Le coffre est ouvert. Il est vide."
@@ -110,7 +112,7 @@ action_coffre() {
 }
 
 action_ouvrir() {
-    local d; d="$(base_monde)/couloir"
+    local d; d="$(base_monde)/niveau2_couloir"
     echo
     if [ ! -f "$d/porte_metro/cle" ]; then
         echec "La porte est verrouillée. Il faudrait mettre une clé dans la serrure."
@@ -118,10 +120,11 @@ action_ouvrir() {
     fi
     succes "La serrure cède."
     narrer "Un escalier mécanique à l'arrêt descend vers un quai. Une rame attend, portes ouvertes."
-    [ -d "$(base_monde)/metro" ] || generer_niveau3 "$(base_monde)"
+    [ -d "$(base_monde)/niveau3_metro" ] || generer_niveau3 "$(base_monde)"
     etat_set niveau 3
     bandeau "NIVEAU 3 · LE MÉTRO"
-    piste "→ cd ../../metro"
+    etat_set aller "$(base_monde)/niveau3_metro"
+    piste "(Tu descends sur le quai : dossier niveau3_metro/)"
 }
 
 action_billet() {
@@ -138,7 +141,7 @@ action_billet() {
     voie="$(basename "$voie")"
     if [ "$(empreinte "$voie")" = "$(etat_get voie)" ]; then
         fin_normale
-    elif [ -f "$(base_monde)/metro/voies/$voie" ]; then
+    elif [ -f "$(base_monde)/niveau3_metro/voies/$voie" ]; then
         fin_ratee train
     else
         echec "Il n'y a pas de $voie ici."
@@ -146,7 +149,7 @@ action_billet() {
 }
 
 action_allumer() {
-    local d; d="$(base_monde)/salle_attente/guichet/.tablette"
+    local d; d="$(base_monde)/niveau0_salle_attente/guichet/.tablette"
     echo
     if [ ! -f "$d/.batterie" ] && [ ! -f "$d/batterie" ]; then
         echec "L'écran reste noir. Le compartiment de la batterie est vide."
@@ -180,7 +183,8 @@ action_bouton() {
         mystere "Les portes s'ouvrent sur un étage qui n'est pas sur le panneau."
         generer_etage_404
         bandeau "NIVEAU ? · ???" "$COUL_MYSTERE"
-        piste "(Quelque chose est apparu dans l'ascenseur. Regarde partout.)"
+        etat_set aller "$(base_monde)/niveau1_ascenseur/.etage404"
+        piste "(Tu sors de la cabine : dossier .etage404/)"
     else
         narrer "Rien ne se passe."
     fi

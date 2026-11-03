@@ -21,14 +21,14 @@ Options :
 | --- | --- |
 | `--niveau 2` | Mode démo : niveaux 0 à 2 déjà ouverts, départ au niveau 2 |
 
-`./reinitialiser.sh` efface le monde généré. Pour quitter une partie en cours : `exit`.
+`./reinitialiser.sh` efface les niveaux générés. Pour quitter une partie en cours : `exit`.
 
 ## Les lieux et les commandes
 
 | Niveau | Lieu | Commandes |
 | --- | --- | --- |
 | 0 | La salle d'attente | `ls`, `ls -a`, `cd`, `cat`, `./` |
-| 1 | L'ascenseur | `ls -lS`, `grep`, `find`, `mv` |
+| 1 | L'ascenseur | `ls -lS`, `head`, `grep`, `ls -a`, `mv` |
 | 2 | Le couloir | `ps aux`, `grep`, `kill`, `mv` |
 | 3 | Le métro | `tar`, `grep`, `ls -lt`, `chmod +x` |
 

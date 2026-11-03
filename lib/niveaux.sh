@@ -16,7 +16,7 @@ creer_action() {
 
 # ---------------------------------------------------------------- Niveau 0
 generer_niveau0() {
-    local base="$1" d="$1/salle_attente"
+    local base="$1" d="$1/niveau0_salle_attente"
     local n f h appel i nb_fenetres speciale
     n="$(alea 6 15)"            # nombre de chaises
     f="$(alea 1 9)"             # chiffre caché derrière une fausse fenêtre
@@ -93,6 +93,8 @@ Une tablette, posée derrière le guichet. L'écran est fissuré.
 Le compartiment de la batterie est vide.
 Au dos, quelqu'un a gravé à la pointe d'un couteau :
     « Je l'ai laissée là où l'on m'a appelé. »
+Sur la tranche, un bouton d'allumage (./allumer.sh).
+Une fois la batterie dans la tablette, il suffira d'appuyer dessus.
 EOF
     creer_action "$d/guichet/.tablette/allumer.sh" allumer
     creer_action "$d/porte_service.sh" porte_service
@@ -100,7 +102,7 @@ EOF
 
 # ---------------------------------------------------------------- Niveau 1
 generer_niveau1() {
-    local base="$1" d="$1/ascenseur"
+    local base="$1" d="$1/niveau1_ascenseur"
     local m1 m2 x y i
     # y : l'étage de la batterie = le numéro appelé (17 à la première partie)
     y="$(etat_get appel)"
@@ -143,7 +145,15 @@ generer_niveau1() {
             echo "${graffitis[RANDOM % ${#graffitis[@]}]}" >> "$d/$habite/mur.txt"
         fi
     done
-    echo "Une porte coupe-feu. Celle-ci n'est pas tout à fait fermée." > "$d/$habite/porte.txt"
+    cat > "$d/$habite/porte.txt" <<'EOF'
+Une porte coupe-feu. Celle-ci n'est pas tout à fait fermée.
+À côté de la poignée, un clavier à code (./porte_coupe_feu.sh).
+
+Sur le chambranle, quelqu'un a écrit, tout petit :
+  « Ce mur a trop parlé. Deux cents phrases, et une seule parle du code.
+    Inutile de tout lire : grep sait retrouver un mot au milieu du bruit.
+    grep mot fichier »
+EOF
     creer_action "$d/$habite/porte_coupe_feu.sh" porte_coupe_feu
 
     # La batterie, cachée (fichier caché) à l'étage du numéro appelé
@@ -176,7 +186,11 @@ EOF
     cat > "$d/graffitis.txt" <<'EOF'
 Gravé sur le miroir de la cabine, à hauteur d'yeux :
 
-  « un mur qui parle trop, ça pèse lourd. ls -l donne le poids. ls -S trie. »
+  « un mur qui parle trop, ça pèse lourd.
+    ls -l donne le poids de chaque fichier. ls -S les trie, du plus lourd au plus léger.
+    les deux ensemble : ls -lS
+    et | head -3 pour ne garder que les trois premiers.
+    exemple : ls -lS dossier*/fichier.txt | head -3 »
   « grep trouve un mot au milieu de mille »
   « compte les boutons. ls ne ment pas : ce qui manque n'apparaît pas »
   « je suis sorti à mon numéro. j'y ai caché ce qui manque à la tablette.
@@ -207,7 +221,7 @@ EOF
 
 # L'étage secret, créé par le bouton sans numéro
 generer_etage_404() {
-    local d; d="$(base_monde)/ascenseur/.etage404"
+    local d; d="$(base_monde)/niveau1_ascenseur/.etage404"
     mkdir -p "$d"
     cat > "$d/regarder_autour.txt" <<'EOF'
 Les portes s'ouvrent sur un étage qui n'est pas sur le panneau.
@@ -221,8 +235,9 @@ EOF
 
 # ---------------------------------------------------------------- Niveau 2
 generer_niveau2() {
-    local base="$1" d="$1/couloir" i
+    local base="$1" d="$1/niveau2_couloir" i chambre
     mkdir -p "$d/porte_metro"
+    chambre="chambre$(alea 201 299)"   # la chambre d'où émet le brouillage
     etat_set coffre "$(empreinte 5281)"
     etat_set mdp "$(empreinte miroir)"
 
@@ -230,6 +245,22 @@ generer_niveau2() {
         mkdir -p "$d/chambre$i"
         echo "Ne pas déranger." > "$d/chambre$i/porte.txt"
     done
+    # La chambre de l'émetteur
+    echo "La porte est entrouverte. Derrière, un grésillement continu." > "$d/$chambre/porte.txt"
+    cat > "$d/$chambre/regarder_autour.txt" <<EOF
+Une chambre d'hôtel. Le lit n'a jamais été défait.
+Sur la table de nuit, un petit boîtier noir clignote : l'émetteur.
+C'est lui qui brouille la télévision du couloir.
+Au pied du lit, une valise. Étiquette : « Passager n° $(etat_get appel) ».
+EOF
+    cat > "$d/$chambre/valise.txt" <<'EOF'
+Dans la valise, rien d'autre qu'une feuille pliée en quatre.
+L'écriture te dit vaguement quelque chose :
+
+  « La télé ne dit la vérité qu'un instant, juste avant la fin.
+    Ce qu'elle dit à ce moment-là allume la tablette du guichet.
+    Ne pars pas sans l'avoir écoutée jusqu'au bout. »
+EOF
     cat > "$d/regarder_autour.txt" <<'EOF'
 Un couloir d'hôtel. Moquette bordeaux à motifs, appliques murales jaunâtres.
 Les chambres 201 à 299 sont toutes fermées,
@@ -240,6 +271,7 @@ Quelque chose brouille le signal.
 À côté, un coffre mural.
 Au bout du couloir, une porte marquée MÉTRO, avec une serrure.
 Sous la télévision, une notice plastifiée est scotchée au meuble.
+Une des chambres a sa porte entrouverte. Il en sort un grésillement.
 EOF
     cat > "$d/notice_tv.txt" <<'EOF'
         HÔTEL — NOTICE DU TÉLÉVISEUR D'ÉTAGE
@@ -248,6 +280,7 @@ EOF
     Un appareil de l'étage émet sans doute en continu.
     La liste des appareils en fonctionnement s'affiche avec : ps aux
     Elle est longue : filtrez-la avec | grep suivi d'un mot-clé.
+    La dernière colonne indique aussi d'où l'appareil émet.
     Chaque appareil porte un numéro (PID, 2e colonne).
     kill suivi de ce numéro met l'appareil hors tension.
 
@@ -265,14 +298,15 @@ EOF
     creer_action "$d/coffre.sh" coffre
     echo "Une serrure. Il faudrait y mettre une clé." > "$d/porte_metro/serrure.txt"
     creer_action "$d/porte_metro/ouvrir.sh" ouvrir
-    demarrer_brouillage
+    demarrer_brouillage "$d/$chambre/emetteur"
 }
 
+# Lance l'émetteur en arrière-plan : demarrer_brouillage chemin_du_script
 demarrer_brouillage() {
     arreter_brouillage
-    mkdir -p "$ETAT_DIR"
-    printf '#!/usr/bin/env bash\n# Brouillage du signal télé\nwhile true; do sleep 1 & wait $!; done\n' > "$ETAT_DIR/brouillage"
-    nohup bash "$ETAT_DIR/brouillage" > /dev/null 2>&1 &
+    printf '#!/usr/bin/env bash\n# Émetteur de brouillage\nwhile true; do sleep 1 & wait $!; done\n' > "$1"
+    chmod 755 "$1"
+    nohup bash "$1" > /dev/null 2>&1 &
     etat_set brouillage_pid "$!"
 }
 
@@ -293,7 +327,7 @@ brouillage_actif() {
 
 # ---------------------------------------------------------------- Niveau 3
 generer_niveau3() {
-    local base="$1" d="$1/metro" bonne_voie bon_billet l i maintenant tmp
+    local base="$1" d="$1/niveau3_metro" bonne_voie bon_billet l i maintenant tmp
     mkdir -p "$d/voies"
     bonne_voie="$(alea 1 3)"
     etat_set voie "$(empreinte "voie$bonne_voie")"
@@ -330,6 +364,12 @@ EOF
 
   5. EMBARQUEMENT
      Lancez votre billet en indiquant la voie : ./billet voie
+
+  ⚠ AVIS AUX VOYAGEURS
+     Des voyageurs signalent un étage absent des plans, au-dessus du
+     99, accessible depuis l'ascenseur. L'accès répondrait à un mot.
+     Une tablette retrouvée derrière un guichet le connaîtrait.
+     Le réseau décline toute responsabilité.
 
   Nous vous remercions de votre patience.
 EOF

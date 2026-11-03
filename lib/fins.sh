@@ -8,7 +8,7 @@ fin_normale() {
     narrer "Les néons défilent, de plus en plus vite, puis plus rien."
     pause 1
     glitch
-    clear
+    echo
     echo "${COUL_SUCCES}"
     cat <<'EOF'
    ███████  ██████  ██████  ████████ ██
@@ -35,7 +35,7 @@ fin_ratee() {
     narrer "Les néons se rallument."
     pause 1
     glitch
-    clear
+    echo
     narrer "Une salle d'attente d'un blanc aveuglant."
     echo
     echo "        ${ROUGE}${GRAS}NUMÉRO APPELÉ : $(( $(etat_get appel) + 1 ))${RESET}"
@@ -55,7 +55,7 @@ fin_secrete() {
     machine="${HOSTNAME:-$(hostname 2> /dev/null || echo machine)}"
 
     glitch
-    clear
+    echo
     pause 2
     mystere "lecture : enregistrement_retrouve.mp4"
     echo
@@ -79,14 +79,14 @@ fin_secrete() {
     echo "${MARGE}Envoyé  : dans 3 minutes"
     pause 3
     glitch
-    clear
+    echo
     pause 2
 
     # La boucle recommence : nouvelle salle d'attente, numéro suivant
     arreter_brouillage
     ancien="$(etat_get appel)"
     nouveau=$(( ancien + 1 ))
-    base="$JEU_ROOT/monde/boucle_$nouveau"
+    base="$JEU_ROOT/niveaux/boucle_$nouveau"
     rm -rf "$base"
     etat_set appel "$nouveau"
     etat_set base "$base"
@@ -94,7 +94,7 @@ fin_secrete() {
     etat_set niveau 0
     etat_set debut "$(date +%s)"
     generer_niveau0 "$base"
-    etat_set aller "$base/salle_attente"
+    etat_set aller "$base/niveau0_salle_attente"
 
     mystere "Tu ouvres les yeux. Une odeur de produits d'entretien, un blanc aveuglant..."
     pause 1

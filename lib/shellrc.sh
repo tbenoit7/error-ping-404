@@ -13,11 +13,19 @@ alias grep='grep --color=auto'
 __jeu_lieu() {
     case "$PWD" in
         *"/.etage404"*)       echo "Niveau ? · ???" ;;
-        *"/salle_attente"*)   echo "Niveau 0 · La salle d'attente" ;;
-        *"/ascenseur"*)       echo "Niveau 1 · L'ascenseur" ;;
-        *"/couloir"*)         echo "Niveau 2 · Le couloir" ;;
-        *"/metro"*)           echo "Niveau 3 · Le métro" ;;
+        *"/niveau0_salle_attente"*)   echo "Niveau 0 · La salle d'attente" ;;
+        *"/niveau1_ascenseur"*)       echo "Niveau 1 · L'ascenseur" ;;
+        *"/niveau2_couloir"*)         echo "Niveau 2 · Le couloir" ;;
+        *"/niveau3_metro"*)           echo "Niveau 3 · Le métro" ;;
         *)                    echo "Hors des murs" ;;
+    esac
+}
+
+# Chemin courant, affiché depuis la racine du jeu (ex. niveaux/niveau0_salle_attente/fenetres)
+__jeu_chemin() {
+    case "$PWD" in
+        "$JEU_ROOT"/*) echo "${PWD#"$JEU_ROOT"/}" ;;
+        *)             echo "$PWD" ;;
     esac
 }
 
@@ -49,7 +57,7 @@ __jeu_prompt() {
     lieu="$(__jeu_lieu)"
     [[ "$lieu" == *"?"* ]] && couleur_lieu="$COUL_MYSTERE"
     # Une ligne vide, puis le bandeau du lieu et du temps, puis le dossier courant
-    PS1="\n\[$couleur_lieu\]━━ \[$GRAS\]$lieu\[$RESET$couleur_lieu\] ━━ \[$RESET$couleur\]$(temps_formate)\[$RESET$couleur_lieu\] ━━\[$RESET\]\n\[$GRIS\]\W\[$RESET\] \$ "
+    PS1="\n\[$couleur_lieu\]━━ \[$GRAS\]$lieu\[$RESET$couleur_lieu\] ━━ \[$RESET$couleur\]$(temps_formate)\[$RESET$couleur_lieu\] ━━\[$RESET\]\n\[$GRIS\]$(__jeu_chemin)\[$RESET\] \$ "
 }
 PROMPT_COMMAND=__jeu_prompt
 

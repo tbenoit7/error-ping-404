@@ -35,12 +35,12 @@ trap 'ecran_normal' EXIT
 
 # ---------------------------------------------------------------- Remise à zéro
 arreter_brouillage
-rm -rf "$JEU_ROOT/monde" "$ETAT_DIR"
-mkdir -p "$JEU_ROOT/monde" "$ETAT_DIR"
+rm -rf "$JEU_ROOT/niveaux" "$ETAT_DIR"
+mkdir -p "$JEU_ROOT/niveaux" "$ETAT_DIR"
 etat_set duree $(( DUREE_MINUTES * 60 ))
 etat_set heure $(( 10#$(date +%H) ))
 etat_set appel 17
-etat_set base "$JEU_ROOT/monde"
+etat_set base "$JEU_ROOT/niveaux"
 etat_set fini 0
 etat_set tablette 0
 
@@ -108,15 +108,15 @@ intro() {
 ecran_sombre
 intro
 
-# ---------------------------------------------------------------- Le monde
-generer_jusqua "$JEU_ROOT/monde" "$NIVEAU_DEPART"
+# ---------------------------------------------------------------- Les niveaux
+generer_jusqua "$JEU_ROOT/niveaux" "$NIVEAU_DEPART"
 etat_set debut "$(date +%s)"
 
 case "$NIVEAU_DEPART" in
-    0) depart="$JEU_ROOT/monde/salle_attente"; titre="NIVEAU 0 · LA SALLE D'ATTENTE" ;;
-    1) depart="$JEU_ROOT/monde/ascenseur";     titre="NIVEAU 1 · L'ASCENSEUR" ;;
-    2) depart="$JEU_ROOT/monde/couloir"; titre="NIVEAU 2 · LE COULOIR" ;;
-    3) depart="$JEU_ROOT/monde/metro";   titre="NIVEAU 3 · LE MÉTRO" ;;
+    0) depart="$JEU_ROOT/niveaux/niveau0_salle_attente"; titre="NIVEAU 0 · LA SALLE D'ATTENTE" ;;
+    1) depart="$JEU_ROOT/niveaux/niveau1_ascenseur";     titre="NIVEAU 1 · L'ASCENSEUR" ;;
+    2) depart="$JEU_ROOT/niveaux/niveau2_couloir"; titre="NIVEAU 2 · LE COULOIR" ;;
+    3) depart="$JEU_ROOT/niveaux/niveau3_metro";   titre="NIVEAU 3 · LE MÉTRO" ;;
 esac
 bandeau "$titre"
 
@@ -128,3 +128,4 @@ arreter_brouillage
 echo
 piste "Merci d'avoir joué à Error Ping 404."
 echo
+read -r -p "$MARGE$COUL_PISTE[ Appuie sur Entrée pour quitter ]$RESET "

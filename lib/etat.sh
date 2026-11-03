@@ -64,7 +64,7 @@ temps_formate() {
 # Dossier du monde courant (change après la fin secrète)
 base_monde() {
     local b; b="$(etat_get base)"
-    echo "${b:-$JEU_ROOT/monde}"
+    echo "${b:-$JEU_ROOT/niveaux}"
 }
 
 # Petit tirage aléatoire : alea min max
